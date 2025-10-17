@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IrisShip — Plataforma de Fretes</title>
+  <style>
+    :root{
+      --bg:#0f1724; /* dark navy */
+      --card:#0b1220;
+      --accent:#4f46e5;
+      --muted:#94a3b8;
+      --glass: rgba(255,255,255,0.04);
+      --radius:12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#071025 0%, #07142a 60%);
+      color:#e6eef9;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+    }
+    /* container */
+    .container{max-width:1100px;margin:28px auto;padding:20px}
+
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;box-shadow:0 6px 20px rgba(79,70,229,0.18);}
+    .brand h1{margin:0;font-size:1.15rem}
+    nav{display:flex;gap:10px;align-items:center}
+    .nav-link{background:transparent;border:0;color:var(--muted);padding:8px 12px;border-radius:10px;cursor:pointer}
+    .nav-link:hover{color:var(--accent)}
+    .btn{background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 8px 30px rgba(79,70,229,0.18);}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+    /* hero */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-top:24px}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:22px;border-radius:var(--radius);box-shadow:0 6px 30px rgba(2,6,23,0.6);}
+    .hero h2{margin:0 0 8px 0;font-size:2rem}
+    .hero p{margin:0 0 18px 0;color:var(--muted)}
+    .card-cta{display:flex;gap:10px}
+
+    /* features */
+    .features{display:flex;gap:14px;margin-top:18px}
+    .feature{flex:1;padding:14px;background:var(--card);border-radius:10px}
+    .muted{color:var(--muted)}
+
+    /* form */
+    form{display:flex;flex-direction:column;gap:10px}
+    .row{display:flex;gap:10px}
+    .col{flex:1}
+    label{font-size:0.85rem;color:var(--muted);display:block;margin-bottom:6px}
+    input[type=text], input[type=email], input[type=number], select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    textarea{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    .section-title{font-weight:600;margin-top:8px}
+
+    /* small screens */
+    @media (max-width:880px){
+      .hero{grid-template-columns:1fr;}
+      .container{padding:12px}
+    }
+
+    /* page views */
+    .view{display:none}
+    .view.active{display:block}
+
+    /* success modal */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);z-index:40}
+    .modal-card{background:linear-gradient(180deg,#071022,#0b1630);padding:22px;border-radius:14px;min-width:320px;box-shadow:0 12px 50px rgba(0,0,0,0.6);}
+
+    /* small helpers */
+    .muted-2{color:#9aa8c1}
+    footer{margin-top:28px;padding:20px;text-align:center;color:var(--muted)}
+
+    /* dashboard table */
+    .table{width:100%;border-collapse:collapse}
+    .table th, .table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left;font-size:0.92rem}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--glass);font-size:0.8rem}
+
+    /* small animation */
+    .fade-in{animation:fadeIn .45s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    .soon-badge{background:linear-gradient(90deg,#ff7a7a,#ffbf7a);padding:6px 10px;border-radius:999px;color:#081026;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">IS</div>
+        <div>
+          <h1>IrisShip</h1>
+          <div class="muted" style="font-size:0.85rem">Seu app de fretes — nacional com visão global</div>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-link" data-link="home">Home</button>
+        <button class="nav-link" data-link="frete-nacional">Frete Nacional</button>
+        <button class="nav-link" data-link="frete-internacional">Frete Internacional</button>
+        <button id="btn-login" class="btn">Entrar</button>
+      </nav>
+    </header>
+
+    <!-- HOME -->
+    <main id="home" class="view active">
+      <div class="hero panel fade-in">
+        <div>
+          <h2>Envie sua carga com rapidez e transparência</h2>
+          <p class="muted">IrisShip conecta remetentes a transportadoras com tecnologia, acompanhando sua carga do ponto A ao B. Começamos no Brasil — internacional em breve.</p>
+          <div class="card-cta">
+            <button class="btn" id="cta-solicitar">Solicitar frete agora</button>
+            <button class="ghost" id="cta-sobre">Como funciona</button>
+          </div>
+
+          <div class="features">
+            <div class="feature">
+              <div class="section-title">Cotação instantânea</div>
+              <div class="muted-2">Preencha os dados da carga e receba um resumo do frete.</div>
+            </div>
+            <div class="feature">
+              <div class="section-title">Rastreamento</div>
+              <div class="muted-2">Acompanhe o transporte e histórico do pedido (próximas fases).</div>
+            </div>
+            <div class="feature">
+              <div class="section-title">Escalável</div>
+              <div class="muted-2">Pensado para crescer: nacional primeiro, depois internacional.</div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel" style="border-radius:16px">
+          <h3 style="margin-top:0">Solicite um frete — teste rápido</h3>
+          <p class="muted">Formulário reduzido para solicitar uma cotação rápida (funcionalidade completa em Frete Nacional).</p>
+          <div style="margin-top:8px">
+            <label class="muted">CEP de coleta</label>
+            <input id="quick-cep" type="text" placeholder="CEP" />
+            <label class="muted" style="margin-top:8px">CEP de entrega</label>
+            <input id="quick-cep2" type="text" placeholder="CEP" />
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn" id="quick-send">Enviar</button>
+              <button class="ghost" id="quick-clear">Limpar</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <section style="margin-top:18px" class="panel fade-in">
+        <h3 style="margin-top:0">Por que IrisShip?</h3>
+        <p class="muted">Foco em simplicidade e rastreabilidade. Interface mobile-friendly e formulário claro para reduzir erros de preenchimento.</p>
+      </section>
+
+    </main>
+
+    <!-- LOGIN -->
+    <section id="login" class="view panel">
+      <h3>Entrar na IrisShip</h3>
+      <form id="login-form">
+        <label>E-mail</label>
+        <input id="login-email" type="email" placeholder="seu@exemplo.com" required />
+        <label>Senha</label>
+        <input id="login-pass" type="password" placeholder="••••••" required />
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="btn" type="submit">Entrar</button>
+          <button class="ghost" type="button" id="back-home">Voltar</button>
+        </div>
+        <p class="muted-2" style="margin-top:10px">Nota: login é simulado — qualquer e‑mail/ senha funciona para demo.</p>
+      </form>
+    </section>
+
+    <!-- FRETE NACIONAL -->
+    <section id="frete-nacional" class="view panel">
+      <h3>Frete Nacional</h3>
+      <p class="muted">Preencha os dados abaixo para solicitar uma cotação. Os dados ficam salvos localmente no seu navegador (localStorage).</p>
+
+      <form id="frete-form">
+        <div>
+          <div class="section-title">Endereço de Coleta</div>
+          <div class="row">
+            <div class="col">
+              <label>CEP</label>
+              <input name="pickup_cep" required type="text" />
+            </div>
+            <div class="col">
+              <label>Cidade</label>
+              <input name="pickup_cidade" required type="text" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col"><label>Bairro</label><input name="pickup_bairro" type="text"/></div>
+            <div class="col"><label>Rua</label><input name="pickup_rua" type="text"/></div>
+          </div>
+          <div class="row">
+            <div class="col"><label>Número</label><input name="pickup_num" type="text"/></div>
+            <div class="col"><label>Complemento</label><input name="pickup_comp" type="text"/></div>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0" />
+
+        <div>
+          <div class="section-title">Endereço de Entrega</div>
+          <div class="row">
+            <div class="col"><label>CEP</label><input name="dest_cep" required type="text"/></div>
+            <div class="col"><label>Cidade</label><input name="dest_cidade" required type="text"/></div>
+          </div>
+          <div class="row">
+            <div class="col"><label>Bairro</label><input name="dest_bairro" type="text"/></div>
+            <div class="col"><label>Rua</label><input name="dest_rua" type="text"/></div>
+          </div>
+          <div class="row">
+            <div class="col"><label>Número</label><input name="dest_num" type="text"/></div>
+            <div class="col"><label>Complemento</label><input name="dest_comp" type="text"/></div>
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0" />
+
+        <div>
+          <div class="section-title">Dados da Carga</div>
+          <div class="row">
+            <div class="col">
+              <label>Tipo de mercadoria</label>
+              <select name="tipo" required>
+                <option value="">Escolha...</option>
+                <option value="carga_geral">Carga geral</option>
+                <option value="controle_temp">Controle de temperatura</option>
+                <option value="fragil">Frágil</option>
+                <option value="perigosa">Perigosa</option>
+              </select>
+            </div>
+            <div class="col"><label>Quantidade</label><input name="quantidade" type="number" min="1" value="1" required/></div>
+          </div>
+
+          <div class="row">
+            <div class="col"><label>Comprimento (m)</label><input name="comprimento" type="number" step="0.01" required/></div>
+            <div class="col"><label>Largura (m)</label><input name="largura" type="number" step="0.01" required/></div>
+          </div>
+          <div class="row" style="margin-bottom:10px">
+            <div class="col"><label>Altura (m)</label><input name="altura" type="number" step="0.01" required/></div>
+            <div class="col"><label>Peso (kg)</label><input name="peso" type="number" step="0.01" required/></div>
+          </div>
+
+          <label>Observações</label>
+          <textarea name="obs" rows="3" placeholder="Ex.: cuidado com empilhamento, pallets, etc."></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="btn" type="submit">Enviar solicitação</button>
+          <button class="ghost" type="button" id="reset-form">Limpar formulário</button>
+        </div>
+      </form>
+
+      <div id="admin-panel" style="margin-top:14px;display:none" class="panel">
+        <h4>Solicitações salvas (local)</h4>
+        <div id="requests-area"></div>
+      </div>
+
+    </section>
+
+    <!-- FRETE INTERNACIONAL -->
+    <section id="frete-internacional" class="view panel">
+      <h3>Frete Internacional <span class="soon-badge">Em breve</span></h3>
+      <p class="muted">Estamos preparando a integração com agentes internacionais e documentação aduaneira. Esta aba foi criada para já manter o espaço reservado no produto.</p>
+      <div style="margin-top:12px">
+        <label class="section-title">O que teremos aqui (futuro)</label>
+        <ul class="muted-2">
+          <li>Cálculo de Incoterms</li>
+          <li>Preenchimento simplificado de documentos aduaneiros</li>
+          <li>Integração com transitários e rastreamento global</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      IrisShip · Protótipo apenas local· Feito por Luis Heli
+    </footer>
+
+  </div>
+
+  <!-- modal template -->
+  <div id="modal" style="display:none" class="modal">
+    <div class="modal-card">
+      <div id="modal-content"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px">
+        <button class="btn" id="modal-close">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple SPA navigation
+    const links = document.querySelectorAll('[data-link]');
+    const views = document.querySelectorAll('.view');
+    const btnLogin = document.getElementById('btn-login');
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modal-content');
+
+    function showView(id){
+      views.forEach(v=>v.classList.remove('active'));
+      const view = document.getElementById(id);
+      if(view) view.classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    links.forEach(btn=>btn.addEventListener('click',()=>showView(btn.dataset.link)));
+    document.getElementById('cta-solicitar').addEventListener('click',()=>showView('frete-nacional'));
+    document.getElementById('cta-sobre').addEventListener('click',()=>alert('IrisShip conecta remetentes e transportadoras — preencha o formulário de frete para testar.'));
+
+    // Quick form
+    document.getElementById('quick-send').addEventListener('click',()=>{
+      const a = document.getElementById('quick-cep').value.trim();
+      const b = document.getElementById('quick-cep2').value.trim();
+      if(!a||!b) return showModal('Preencha os dois CEPs para teste.');
+      showModal('Cotação rápida enviada! (demo)');
+    });
+    document.getElementById('quick-clear').addEventListener('click',()=>{document.getElementById('quick-cep').value='';document.getElementById('quick-cep2').value='';});
+
+    // Login simulation
+    document.getElementById('btn-login').addEventListener('click',()=>showView('login'));
+    document.getElementById('back-home').addEventListener('click',()=>showView('home'));
+    document.getElementById('login-form').addEventListener('submit',e=>{
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      sessionStorage.setItem('iris_user', email);
+      document.getElementById('btn-login').textContent = 'Conta: ' + (email.length>16?email.slice(0,14)+'...':email);
+      toggleAdminPanel(true);
+      showModal('Login efetuado (demo). Agora você pode ver as solicitações salvas localmente.');
+    });
+
+    // Modal helpers
+    function showModal(html){modalContent.innerHTML = '<div>'+html+'</div>';modal.style.display='flex';}
+    document.getElementById('modal-close').addEventListener('click',()=>modal.style.display='none');
+
+    // Frete form handling
+    const freteForm = document.getElementById('frete-form');
+    freteForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = new FormData(freteForm);
+      const obj = {};
+      data.forEach((v,k)=>obj[k]=v);
+      obj.timestamp = new Date().toISOString();
+      saveRequest(obj);
+      freteForm.reset();
+      showModal('Solicitação enviada! Ela foi salva localmente no seu navegador.');
+      renderRequests();
+    });
+
+    document.getElementById('reset-form').addEventListener('click',()=>freteForm.reset());
+
+    // localStorage helpers
+    function saveRequest(req){
+      const key = 'irisship_requests';
+      const arr = JSON.parse(localStorage.getItem(key) || '[]');
+      arr.unshift(req);
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+    function loadRequests(){
+      return JSON.parse(localStorage.getItem('irisship_requests') || '[]');
+    }
+
+    // Admin panel
+    function renderRequests(){
+      const requests = loadRequests();
+      const area = document.getElementById('requests-area');
+      if(requests.length===0){area.innerHTML='<div class="muted">Nenhuma solicitação encontrada.</div>';return}
+      let html = '<table class="table"><thead><tr><th>Data</th><th>Rota</th><th>Tipo</th><th>Peso(kg)</th><th>Qtd</th></tr></thead><tbody>';
+      requests.forEach(r=>{
+        const from = (r.pickup_cidade||r.pickup_cep||'--');
+        const to = (r.dest_cidade||r.dest_cep||'--');
+        html += `<tr><td>${new Date(r.timestamp).toLocaleString()}</td><td>${from} → ${to}</td><td><span class="pill">${r.tipo}</span></td><td>${r.peso}</td><td>${r.quantidade}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      html += '<div style="margin-top:8px"><button id="export-json" class="btn">Exportar JSON</button> <button id="clear-requests" class="ghost">Limpar</button></div>';
+      area.innerHTML = html;
+      document.getElementById('export-json').addEventListener('click', ()=>{
+        const data = JSON.stringify(requests, null, 2);
+        const blob = new Blob([data], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'irisship_requests.json'; document.body.appendChild(a); a.click(); a.remove();
+      });
+      document.getElementById('clear-requests').addEventListener('click', ()=>{
+        if(!confirm('Apagar todas as solicitações salvas localmente?')) return;
+        localStorage.removeItem('irisship_requests');
+        renderRequests();
+      });
+    }
+
+    function toggleAdminPanel(show){
+      const panel = document.getElementById('admin-panel');
+      panel.style.display = show ? 'block' : 'none';
+      if(show) renderRequests();
+    }
+
+    // On load: check session
+    window.addEventListener('load', ()=>{
+      const user = sessionStorage.getItem('iris_user');
+      if(user){document.getElementById('btn-login').textContent = 'Conta: '+(user.length>16?user.slice(0,14)+'...':user);toggleAdminPanel(true)}
+      // shortcut: allow pressing H to go home
+      document.addEventListener('keydown', (e)=>{if(e.key==='h') showView('home')});
+    });
+
+  </script>
+</body>
+</html>
